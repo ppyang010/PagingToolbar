@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="page.css">
+  <script type="text/javascript" src="page.js"></script>
+</head>
+<body>
+<div id="test"></div>
+<script type="text/javascript">
+/**
+  Constructs page objects
+  @class page
+  @constructor
+  @example
+  **/
+  var p=new page({
+        "id_dom":"test",
+        "total":60,
+        "per_page":5,
+        "nowpage":2,
+        "callback":function(now){
+                console.log('当前页:' + now);
+            },
+        //加的功能
+        url:'xx',
+        method:'post'
+   });
+//提供设定url 刷新页面  指定页跳转  等方法
+</script>
+</body>
+</html>
