@@ -14,21 +14,25 @@
         var xhr=createXHR();
         obj.async=obj.async||true;
         obj.method=obj.method||"post";
+        obj.data=params(obj.data);
         //通过使用JS随机字符串解决IE浏览器第二次默认获取缓存的问题
         obj.url = obj.url + '?rand=' + Math.random();
-        xhr.open(obj.method,obj.url,obj.async);
         if (obj.method === 'post') {
           //post方式需要自己设置http的请求头，来模仿表单提交。
           //放在open方法之后，send方法之前。
-          xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-          xhr.send(params(obj.data));		//post方式将数据放在send()方法里
+            xhr.open(obj.method,obj.url,obj.async);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.send(obj.data);		//post方式将数据放在send()方法里
         } else {
-          xhr.send(null);		//get方式则填null
+            obj.url += obj.url.indexOf('?') == -1 ? '?' + obj.data : '&' + obj.data;
+            xhr.open(obj.method,obj.url,obj.async);
+            xhr.send(null);		//get方式则填null
         }
 
         if(obj.async){
-            xhr.onreadystatechange= function(callback){//使用异步调用的时候，需要触发readystatechange 事件
+            xhr.onreadystatechange= function(){//使用异步调用的时候，需要触发readystatechange 事件
                 if(xhr.readyState == 4){//判断对象的状态是否交互完成
+                	console.log(xhr);
                     callback(xhr);
                 }
               }
@@ -37,7 +41,7 @@
         }
         //响应
         function callback(xhr){
-            if(xhr.status >= 200 && xhr.status>300||xhr==304){
+            if(xhr.status >= 200 && xhr.status<300||xhr==304){
                 obj.success(xhr.responseText);
             }else{
                 console.log("Error:"+xhr.status);

@@ -17,17 +17,17 @@
   @constructor
   @example
   **/
-  var p=new page({
-        "id_dom":"test",
-        "total":60,
-        "per_page":5,
-        "nowpage":2,
-        "callback":function(now){
-                console.log('当前页:' + now);
-            },
-        //加的功能
+  var p=new pager({
+        domID:"test",
+        method:'post',
         url:'xx',
-        method:'post'
+        pagesize:5,
+        curpage:1,
+        callback:function(data,all){
+            console.log('数据列表' + data);
+            console.log('全部数据'+all);
+        }
+
    });
 //提供设定url 刷新页面  指定页跳转  等方法
 </script>
