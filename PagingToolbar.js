@@ -1,6 +1,7 @@
 
 //流程
-//初始化 根据url method pagesize curpage 返回需要（数据列表） 总记录数 当前页  每页数量
+//初始化 根据url method pagesize curpage
+//返回需要（数据列表） 总记录数 当前页 每页数量
 // 根据返回的数据列表创建html
 //页面跳转函数-》获取数据 html修改
 //回调函数（列表数据json） 解析页面 生成数据列表
@@ -42,7 +43,7 @@
             ajax({
         	   method:options.method,
         	   url:options.url,
-        	   data:{},
+        	   data:{'curpage':options.curpage,'pagesize':options.pagesize},
         	   success:function(data){
         		console.log(data);
         		console.log(options);
@@ -57,8 +58,17 @@
          * 生成HTML
          * @return {[type]} [description]
          */
-        _renderHTML:function(){
-        	//console.dir(_self);
+        _renderHTML:function(data,dom){
+            var _self=this;
+            var groups=5;//连续分页数
+            var curpage=_self._options.curpage||1;//当前页
+            var pagesize=_self._options.pagesize||10;//每页记录数
+            var total=data.total||0;//总记录数
+            var totalpage=(total%pagesize)==0?total/pagesize:(total/pagesize)+1;
+
+            //<=连续分页数
+            //>连续分页数
+
             console.log('run');
             this._initEvent();
         },
