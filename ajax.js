@@ -1,3 +1,4 @@
+// ajax封装
 (function(){
 
     function createXHR() {
@@ -13,7 +14,7 @@
     function ajax(obj) {
         var xhr=createXHR();
         obj.dataType=obj.dataType||"json";
-        obj.data=params(obj.data);
+        obj.data=params(obj.data||{});
         if(obj.dataType=="jsonp"){//jsonp方式
             jsonp(obj);
             return;
@@ -38,7 +39,7 @@
         if(obj.async){
             xhr.onreadystatechange= function(){//使用异步调用的时候，需要触发readystatechange 事件
                 if(xhr.readyState == 4){//判断对象的状态是否交互完成
-                	console.log(xhr);
+                	// console.log(xhr);
                     callback(xhr);
                 }
               }
@@ -63,11 +64,11 @@
      */
     function jsonp(obj){
         // 生成随机函数名并指向传入的回调函数
-        var callbackfun = "callbackfun_" + randomString(32);
-        eval( callbackfun+ " = obj.success; ");
-        // var callbakfun=obj.success;
-        // obj.url += "&callback=callbakfun";
-        obj.url += "?callback="+callbackfun;
+        // var callbackfun = "callbackfun_" + randomString(32);
+        // eval( callbackfun+ " = obj.success; ");
+        // obj.url += "?callback="+callbackfun;
+        var callbakfun=obj.success;
+        obj.url += "?callback=callbakfun";
         obj.url += obj.url.indexOf('?') == -1 ? '?' + obj.data : '&' + obj.data;
         var script=document.createElement("script");
         script.setAttribute("src",obj.url);
@@ -99,6 +100,7 @@
 
 
 
+//使用示例
 
 // ajax({
 //   dataType:'json'
