@@ -53,7 +53,7 @@
         	   },
         	   async:true
         	});
-        },
+        }, 
         /**
          * 生成HTML
          * @return {[type]} [description]
