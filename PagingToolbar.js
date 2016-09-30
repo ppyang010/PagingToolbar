@@ -53,7 +53,7 @@
         	   },
         	   async:true
         	});
-        }, 
+        },
         /**
          * 生成HTML
          * @return {[type]} [description]
@@ -68,6 +68,14 @@
 
             //<=连续分页数
             //>连续分页数
+            for(var i=0;i<10;i++){
+              var li=document.createElement("li");
+              var a=document.createElement("a")
+              a.className="he";
+              a.innerText=i;
+              li.appendChild(a);
+              dom.appendChild(li);
+            }
 
             console.log('run');
             this._initEvent();
