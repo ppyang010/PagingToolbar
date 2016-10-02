@@ -70,6 +70,7 @@
             dom.innerHTML="";
             //<=连续分页数
             //>连续分页数
+
             //首页尾页
             if(curpage>1){
               var li=document.createElement('li');
@@ -103,7 +104,6 @@
               li.className="lastPage";
               li.innerHTML='<a href="javascript:void(0);">'+'尾页'+'</a>';
               dom.appendChild(li);
-
             }
             console.log('run');
             this._initEvent(curpage,totalpage);
@@ -176,4 +176,4 @@
 
 window.pager=pager;
 
-})()
+})();
