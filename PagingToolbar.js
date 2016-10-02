@@ -53,30 +53,66 @@
         	   },
         	   async:true
         	});
-        }, 
+        },
         /**
          * 生成HTML
          * @return {[type]} [description]
          */
         _renderHTML:function(data,dom){
             var _self=this;
+            data=JSON.parse(data);
             var groups=5;//连续分页数
             var curpage=_self._options.curpage||1;//当前页
             var pagesize=_self._options.pagesize||10;//每页记录数
             var total=data.total||0;//总记录数
-            var totalpage=(total%pagesize)==0?total/pagesize:(total/pagesize)+1;
-
+            var totalpage=(total%pagesize)==0?Math.floor(total/pagesize):Math.floor((total/pagesize)+1);
+            console.log(totalpage);
+            dom.innerHTML="";
             //<=连续分页数
             //>连续分页数
+            //首页尾页
+            if(curpage>1){
+              var li=document.createElement('li');
+              li.className="firstPage";
+              li.innerHTML='<a href="javascript:void(0);">'+'首页'+'</a>';
+              dom.appendChild(li);
+              var li=document.createElement('li');
+              li.className="prev";
+              li.innerHTML='<a href="javascript:void(0);">&lt;&lt;</a>';
+              dom.appendChild(li);
+            }
 
+            var s=Math.ceil(curpage/groups)-1;
+            for(var i=1;i<=groups;i++){
+              var num=s*groups+i;
+              if(num<=totalpage){
+                var li=document.createElement('li');
+                li.innerHTML='<a href="javascript:void(0);">'+num+'</a>';
+                if(num==curpage){
+                    li.className="cur";
+                }
+                dom.appendChild(li);
+              }
+            }
+            if(curpage<totalpage){
+              var li=document.createElement('li');
+              li.className="next";
+              li.innerHTML='<a href="javascript:void(0);">&gt;&gt;</a>';
+              dom.appendChild(li);
+              var li=document.createElement('li');
+              li.className="lastPage";
+              li.innerHTML='<a href="javascript:void(0);">'+'尾页'+'</a>';
+              dom.appendChild(li);
+
+            }
             console.log('run');
-            this._initEvent();
+            this._initEvent(curpage,totalpage);
         },
         /**
          * 初始化事件
          * @return {[type]} [description]
          */
-        _initEvent:function(){
+        _initEvent:function(curpage,totalpage){
             var _self=this;//pager对象本地化
             var _dom=this._options.dom;
             if(!!_dom){
@@ -99,8 +135,8 @@
     //                    })(num);
                     }
                 }
-                var map={'first':1,
-                    'last':5,
+                var map={'firstPage':1,
+                    'lastPage':totalpage,
                     'prev':_self._options.curpage-1,
                     'next':_self._options.curpage+1
                     }
@@ -124,8 +160,10 @@
          * @return {[type]} [description]
          */
         _gotoPage:function(num){
-            console.log(this);
+            var _self=this;
+            this._options.curpage=num;
             console.log(num);
+            _self._request(this._options);
         }
 
 
