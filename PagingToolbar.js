@@ -24,7 +24,7 @@
         this._options.method=options.method||"get"
         this._init(this._options);
         //_self=this;
-
+   
     }
 
     pager.prototype= {
