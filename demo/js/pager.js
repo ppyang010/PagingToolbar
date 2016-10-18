@@ -1,14 +1,9 @@
 
-//流程
-//初始化 根据url method pagesize curpage
-//返回需要（数据列表） 总记录数 当前页 每页数量
-// 根据返回的数据列表创建html
-//页面跳转函数-》获取数据 html修改
-//回调函数（列表数据json） 解析页面 生成数据列表
-
-
-//对外提供方法
-//设置url 刷新
+/**
+ * 分页组件
+ * 用于请求分页数据显示分页按钮
+ * 依赖另一个ajax.js文件
+ */
 
 
 (function(){
@@ -40,18 +35,22 @@
          */
         _request:function(options){
         	var _self=this;
+          var _data={};
+          for(var s in options.data){
+            _data[s]=options.data[s];
+          }
+          _data['pageNo']=options.curpage;
+          _data['psize']=options.pagesize;
             ajax({
         	   method:options.method,
         	   url:options.url,
-        	   data:{'curpage':options.curpage,'pagesize':options.pagesize},
+        	   data:_data,
         	   success:function(data){
-        		console.log(data);
-        		console.log(options);
-        		console.log(_self);
+
         		_self._renderHTML(data,options.dom);
         		_self._options.callback(data);
         	   },
-        	   async:true
+        	   async:false
         	});
         },
         /**
@@ -61,51 +60,45 @@
         _renderHTML:function(data,dom){
             var _self=this;
             data=JSON.parse(data);
-            var groups=5;//连续分页数
+            var groups=8;//连续分页数
             var curpage=_self._options.curpage||1;//当前页
             var pagesize=_self._options.pagesize||10;//每页记录数
-            var total=data.total||0;//总记录数
+            var total=data.totalCount||0;//总记录数
             var totalpage=(total%pagesize)==0?Math.floor(total/pagesize):Math.floor((total/pagesize)+1);
-            console.log(totalpage);
             dom.innerHTML="";
-            //<=连续分页数
-            //>连续分页数
 
             //首页尾页
             if(curpage>1){
-              var li=document.createElement('li');
-              li.className="firstPage";
-              li.innerHTML='<a href="javascript:void(0);">'+'首页'+'</a>';
-              dom.appendChild(li);
-              var li=document.createElement('li');
-              li.className="prev";
-              li.innerHTML='<a href="javascript:void(0);">&lt;&lt;</a>';
-              dom.appendChild(li);
+              var a=document.createElement('a');
+              a.className="page prev f-bg";
+              a.href="javascript:void(0);";
+              a.innerText=""
+              dom.appendChild(a);
             }
 
-            var s=Math.ceil(curpage/groups)-1;
+            var s=Math.ceil(curpage/groups)-1;//第几页  从0开始 用于计算当前要显示的页码
             for(var i=1;i<=groups;i++){
-              var num=s*groups+i;
+              var num=s*groups+i;//当前要显示的页码
               if(num<=totalpage){
-                var li=document.createElement('li');
-                li.innerHTML='<a href="javascript:void(0);">'+num+'</a>';
+                var a=document.createElement('a');
+                a.innerText=num;
+                a.href="javascript:void(0);";
+                a.className="page";
                 if(num==curpage){
-                    li.className="cur";
+                    a.className="page cur";
                 }
-                dom.appendChild(li);
+                dom.appendChild(a);
               }
             }
+            //下一页
             if(curpage<totalpage){
-              var li=document.createElement('li');
-              li.className="next";
-              li.innerHTML='<a href="javascript:void(0);">&gt;&gt;</a>';
-              dom.appendChild(li);
-              var li=document.createElement('li');
-              li.className="lastPage";
-              li.innerHTML='<a href="javascript:void(0);">'+'尾页'+'</a>';
-              dom.appendChild(li);
+              var a=document.createElement('a');
+              a.className="page next f-bg";
+              a.innerText="";
+              dom.appendChild(a);
+
             }
-            console.log('run');
+            //初始化事件
             this._initEvent(curpage,totalpage);
         },
         /**
@@ -135,8 +128,7 @@
     //                    })(num);
                     }
                 }
-                var map={'firstPage':1,
-                    'lastPage':totalpage,
+                var map={
                     'prev':_self._options.curpage-1,
                     'next':_self._options.curpage+1
                     }
