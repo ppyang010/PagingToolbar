@@ -115,7 +115,7 @@
               dom.appendChild(a);
 
             }
-            
+
             this._initEvent(curpage,totalpage);
         },
         /**

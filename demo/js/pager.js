@@ -34,72 +34,99 @@
          * @return {[type]} [description]
          */
         _request:function(options){
-        	var _self=this;
-          var _data={};
-          for(var s in options.data){
-            _data[s]=options.data[s];
-          }
-          _data['pageNo']=options.curpage;
-          _data['psize']=options.pagesize;
+            var _self=this;
+            var _data={};
+            for(var s in options.data){
+                _data[s]=options.data[s];
+            }
+            _data['pageNo']=options.curpage;
+            _data['psize']=options.pagesize;
             ajax({
-        	   method:options.method,
-        	   url:options.url,
-        	   data:_data,
-        	   success:function(data){
-
-        		_self._renderHTML(data,options.dom);
-        		_self._options.callback(data);
-        	   },
-        	   async:false
-        	});
+                method:options.method,
+            	url:options.url,
+            	data:_data,
+            	success:function(data){
+                    _self._renderHTML(data,options);
+            		_self._options.callback(data);
+            	},
+            	async:false
+            });
         },
         /**
          * 生成HTML
          * @return {[type]} [description]
          */
-        _renderHTML:function(data,dom){
+        _renderHTML:function(data,options){
             var _self=this;
             data=JSON.parse(data);
-            var groups=8;//连续分页数
+            var dom=options.dom;
+            var groups=((options.groups%2 ==1) ? options.groups: options.groups+1) ||5;//连续分页数
             var curpage=_self._options.curpage||1;//当前页
             var pagesize=_self._options.pagesize||10;//每页记录数
             var total=data.totalCount||0;//总记录数
             var totalpage=(total%pagesize)==0?Math.floor(total/pagesize):Math.floor((total/pagesize)+1);
             dom.innerHTML="";
 
-            //首页尾页
+            //上一页
             if(curpage>1){
               var a=document.createElement('a');
               a.className="page prev f-bg";
               a.href="javascript:void(0);";
-              a.innerText=""
+              a.innerText="<";
               dom.appendChild(a);
             }
 
             var s=Math.ceil(curpage/groups)-1;//第几页  从0开始 用于计算当前要显示的页码
-            for(var i=1;i<=groups;i++){
-              var num=s*groups+i;//当前要显示的页码
-              if(num<=totalpage){
-                var a=document.createElement('a');
-                a.innerText=num;
-                a.href="javascript:void(0);";
-                a.className="page";
-                if(num==curpage){
-                    a.className="page cur";
+            var diff=groups/2;//当前页两边显示数 临界点
+            //总页数小于等于连续分页数
+            console.log(totalpage);
+            if(totalpage<=groups){
+                this._cycleShow(s,curpage,totalpage,groups,dom);//生成分页项
+
+            }else { //总页数大于连续分夜数小于连续分页数+临界点  if(totalpage<groups+diff)
+                var ellipsis=document.createElement('a');
+                ellipsis.innerText="...";
+                ellipsis.className="page";
+                if(curpage<=groups-diff){//后面显示省略号
+                    this._cycleShow(s,curpage,totalpage,groups,dom);//生成分页项
+                    dom.appendChild(ellipsis);
+
+                }else if(curpage+diff>=totalpage){//前面显示省略号
+                    dom.appendChild(ellipsis);
+                    this._cycleShow(s,curpage,totalpage,groups,dom);//生成分页项
+                }else {//前后均显示省略号
+                    dom.appendChild(ellipsis);
+                    this._cycleShow(s,curpage,totalpage,groups,dom);//生成分页项
+                    dom.appendChild(ellipsis);
                 }
-                dom.appendChild(a);
-              }
             }
+
             //下一页
             if(curpage<totalpage){
               var a=document.createElement('a');
               a.className="page next f-bg";
-              a.innerText="";
+              a.innerText=">";
               dom.appendChild(a);
 
             }
             //初始化事件
             this._initEvent(curpage,totalpage);
+        },
+        //循环显示分页项
+        _cycleShow:function(s,curpage,totalpage,groups,dom){
+            for(var i=1;i<=groups;i++){
+                var num=s*groups+i;//当前要显示的页码
+                if(num<=totalpage){
+                    var a=document.createElement('a');
+                    a.innerText=num;
+                    a.href="javascript:void(0);";
+                    a.className="page";
+                    if(num==curpage){
+                        a.className="page cur";
+                    }
+                    dom.appendChild(a);
+                }
+            }
         },
         /**
          * 初始化事件

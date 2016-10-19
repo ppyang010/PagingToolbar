@@ -264,11 +264,12 @@ function mainInit(){
 function mainDataListInit(div,type){
   //使用分页组件
   var p=new pager({
-    domID:"pager",
+    domID:"pager",//分页容器id
     method:'get',
     url:'http://study.163.com/webDev/couresByCategory.htm',
-    pagesize:24,
-    curpage:1,
+    pagesize:24,//每页显示数
+    curpage:1,//当前页
+    groups:5,//连续分页数
     data:{"type":type},
     callback:function(data,all){
         div.innerHTML="";
