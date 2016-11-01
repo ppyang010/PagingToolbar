@@ -1,15 +1,10 @@
 
 
-//流程
-//初始化 根据url method pagesize curpage
-//返回需要（数据列表） 总记录数 当前页 每页数量
-// 根据返回的数据列表创建html
-//页面跳转函数-》获取数据 html修改
-//回调函数（列表数据json） 解析页面 生成数据列表
-
-
-//对外提供方法
-//设置url 刷新
+/**
+ * 分页组件
+ * 用于请求分页数据显示分页按钮
+ * 依赖另一个ajax.js文件
+ */
 
 
 (function(){
@@ -40,23 +35,23 @@
          * @return {[type]} [description]
          */
         _request:function(options){
-        	var _self=this;
+            var _self=this;
             var _data={};
             for(var s in options.data){
                 _data[s]=options.data[s];
             }
-            _data['pageNo']=options.curpage;
-            _data['psize']=options.pagesize;
+            _data['curpage']=options.curpage;
+            _data['pagesize']=options.pagesize;
             ajax({
-        	   method:options.method,
-        	   url:options.url,
-        	   data:_data,
-        	   success:function(data){
-        		_self._renderHTML(data,options.dom);
-        		_self._options.callback(data);
-        	   },
-        	   async:true
-        	});
+                method:options.method,
+            	url:options.url,
+            	data:_data,
+            	success:function(data){
+                    _self._renderHTML(data,options);
+            		_self._options.callback((data.rows||data.list),data);
+            	},
+            	async:false
+            });
         },
         /**
          * 生成HTML
@@ -64,15 +59,16 @@
          */
         _renderHTML:function(data,options){
             var _self=this;
+            data=eval("("+data+")")
             data=JSON.parse(data);
             var dom=options.dom;
-            var groups=options.groups||5;//连续分页数
+            var groups=((options.groups%2 ==1) ? options.groups: options.groups+1) ||5;//连续分页数
             var curpage=_self._options.curpage||1;//当前页
             var pagesize=_self._options.pagesize||10;//每页记录数
-            var total=data.total||0;//总记录数
+            var total=data.totalRows||data.total||0;//总记录数
             var totalpage=(total%pagesize)==0?Math.floor(total/pagesize):Math.floor((total/pagesize)+1);
-            console.log(totalpage);
             dom.innerHTML="";
+            console.dir(data);
             //上一页
             if(curpage>1){
               var a=document.createElement('a');
@@ -115,8 +111,24 @@
               dom.appendChild(a);
 
             }
-
+            //初始化事件
             this._initEvent(curpage,totalpage);
+        },
+        //循环显示分页项
+        _cycleShow:function(s,curpage,totalpage,groups,dom){
+            for(var i=1;i<=groups;i++){
+                var num=s*groups+i;//当前要显示的页码
+                if(num<=totalpage){
+                    var a=document.createElement('a');
+                    a.innerText=num;
+                    a.href="javascript:void(0);";
+                    a.className="page";
+                    if(num==curpage){
+                        a.className="page cur";
+                    }
+                    dom.appendChild(a);
+                }
+            }
         },
         /**
          * 初始化事件
@@ -145,8 +157,7 @@
     //                    })(num);
                     }
                 }
-                var map={'firstPage':1,
-                    'lastPage':totalpage,
+                var map={
                     'prev':_self._options.curpage-1,
                     'next':_self._options.curpage+1
                     }
@@ -187,3 +198,15 @@
 window.pager=pager;
 
 })();
+
+
+//流程
+//初始化 根据url method pagesize curpage
+//返回需要（数据列表） 总记录数 当前页 每页数量
+// 根据返回的数据列表创建html
+//页面跳转函数-》获取数据 html修改
+//回调函数（列表数据json） 解析页面 生成数据列表
+
+
+//对外提供方法
+//设置url 刷新
